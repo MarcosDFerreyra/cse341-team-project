@@ -17,3 +17,4 @@ This is practice we must implement
 - Include testing notes in every pull request.
 - Review another team member's code before approving a pull request.
 - Keep commits small and use clear commit messages.
+- Ask for review in the team Microsoft Teams channel when a PR is ready.
