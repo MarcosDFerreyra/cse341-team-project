@@ -4,7 +4,7 @@ import { getDb } from '../db/connect.js';
 const getAllTripsApi = async (req, res) => {
     try {
         const trips = await getAllTrips();
-        res.status(200).json(trips);
+        return res.status(200).json(trips);
     }
     catch (error) { 
         console.log("GET/trips failed");
@@ -37,7 +37,7 @@ const tripDetails = async (req, res) => {
     }
     details.schedules = await db.collection('schedules').find({ tripId }).toArray();
 
-    res.render('trips/details', {
+    return res.render('trips/details', {
         title: 'Trip Details',
         details
     });
@@ -50,7 +50,7 @@ const listTripsPage =  async (req, res) => {
         db.collection('trips').distinct('bestSeason')
     ]);
 
-    res.render('trips/list', {
+    return res.render('trips/list', {
         title: 'Scenic Train Trips',
         regions,
         seasons
