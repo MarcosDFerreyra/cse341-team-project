@@ -49,3 +49,33 @@ describe('GET /api/trains', () => {
     );
   });
 });
+
+describe('GET /api/trains/:id', () => {
+  test('returns one train when the id exists', async () => {
+    const response = await request(app).get('/api/trains/series-e353');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: 'series-e353',
+        name: 'Series E353 Limited Express'
+      })
+    );
+  });
+
+  test('returns 404 when the id does not exist', async () => {
+    const response = await request(app).get('/api/trains/does-not-exist');
+
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({ error: 'Train not found' });
+  });
+});
+
+describe('GET /api-docs', () => {
+  test('serves the Swagger UI', async () => {
+    const response = await request(app).get('/api-docs/');
+
+    expect(response.status).toBe(200);
+    expect(response.text).toContain('Swagger UI');
+  });
+});
