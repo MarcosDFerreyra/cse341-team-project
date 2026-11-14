@@ -1,4 +1,5 @@
 import { getAllTrips, getTripById } from '../models/trips.js';
+import { getDb } from '../db/connect.js';
 
 const getAllTripsApi = async (req, res) => {
     try {
@@ -26,4 +27,34 @@ const getTripByIdApi = async (req, res) => {
     }
 }
 
-export { getAllTripsApi, getTripByIdApi };
+
+const tripDetails = async (req, res) => {
+    const { tripId } = req.params;
+    const db = getDb();
+    const details = await getTripById(tripId);
+    if (!details) {
+        return res.status(404).render('errors/404', { title: 'Page Not Found' });
+    }
+    details.schedules = await db.collection('schedules').find({ tripId }).toArray();
+
+    res.render('trips/details', {
+        title: 'Trip Details',
+        details
+    });
+};
+
+const listTripsPage =  async (req, res) => {
+    const db = getDb();
+    const [regions, seasons] = await Promise.all([
+        db.collection('trips').distinct('region'),
+        db.collection('trips').distinct('bestSeason')
+    ]);
+
+    res.render('trips/list', {
+        title: 'Scenic Train Trips',
+        regions,
+        seasons
+    });
+};
+
+export { getAllTripsApi, getTripByIdApi, tripDetails, listTripsPage };

@@ -1,39 +1,3 @@
-const hookRegionSorter = () => {
-    const regionSelect = document.getElementById('region-filter');
-    if (regionSelect) {
-        regionSelect.addEventListener('change', () => {
-            const selectedRegion = regionSelect.value;
-            const url = new URL(window.location.href);
-
-            if (selectedRegion && selectedRegion !== 'all') {
-                url.searchParams.set('region', selectedRegion);
-            } else {
-                url.searchParams.delete('region');
-            }
-            
-            window.location.href = url.toString();
-        });
-    }
-};
-
-const hookSeasonSorter = () => {
-    const seasonSelect = document.getElementById('season-filter');
-    if (seasonSelect) {
-        seasonSelect.addEventListener('change', () => {
-            const selectedSeason = seasonSelect.value;
-            const url = new URL(window.location.href);
-
-            if (selectedSeason && selectedSeason !== 'all') {
-                url.searchParams.set('season', selectedSeason);
-            } else {
-                url.searchParams.delete('season');
-            }
-            
-            window.location.href = url.toString();
-        });
-    }
-};
-
 const hookTrainsCatalog = async () => {
     const listEl = document.getElementById('trains-list');
     const templateEl = document.getElementById('train-card-template');
@@ -88,8 +52,124 @@ const hookTrainsCatalog = async () => {
     }
 };
 
+const hookTripGrid = async () => {
+    const list = document.getElementById("trips-list");
+    const template = document.getElementById("trips-card-template");
+    const loading = document.getElementById("trips-loading");
+    const errorTrip = document.getElementById("trips-error");
+
+    if (!list || !template)
+        return;
+
+    try {
+        const trips = await fetchTrips();
+        applyFilters(trips);
+        const regionSelect = document.getElementById('region-filter');
+        const seasonSelect = document.getElementById('season-filter');
+
+        if (regionSelect) {
+            regionSelect.addEventListener('change', () => applyFilters(trips));
+        }
+        if (seasonSelect) {
+            seasonSelect.addEventListener('change', () => applyFilters(trips));
+        }
+        if (loading) {
+            loading.hidden = true;
+        }
+    }
+    catch (error) {
+        if (loading) {
+            loading.hidden = true;
+        }
+        if (errorTrip) {
+            errorTrip.hidden = false;
+            errorTrip.textContent = 'Unable to load trips right now. Please try again in a moment.';
+        }
+    }
+};
+
+const applyFilters = (trips) => {
+    const regionSelect = document.getElementById('region-filter');
+    const seasonSelect = document.getElementById('season-filter');
+    const list = document.getElementById('trips-list');
+    if (regionSelect && seasonSelect) {
+        const region = regionSelect.value;
+        const season = seasonSelect.value
+        const filter = trips.filter((trip) =>
+            (region === 'all' || trip.region === region) &&
+            (season === 'all' || trip.bestSeason === season)
+        );
+
+        list.replaceChildren(renderTrips(filter));
+
+        const url = new URL(window.location.href);
+
+        if (region === 'all') {
+            url.searchParams.delete('region');
+        } else {
+            url.searchParams.set('region', region);
+        }
+
+        if (season === 'all') {
+            url.searchParams.delete('season');
+        } else {
+            url.searchParams.set('season', season);
+        }
+
+        history.replaceState(null, '', url);
+    }
+
+};
+
+const fetchTrips = async () => {
+    const response = await fetch("/api/trips")
+    if (!response.ok)
+        throw new Error(`failed to load trips (${response.status})`);
+
+    const response_json = await response.json();
+    const trips = response_json;
+    return trips;
+};
+
+const renderTrips = (trips) => {
+    const template = document.getElementById("trips-card-template");
+    const fragment = document.createDocumentFragment();
+
+    trips.forEach((trip) => {
+        const card = template.content.cloneNode(true);
+
+        const cardEl = card.querySelector(".route-card");
+        cardEl.classList.add(trip.region);
+
+        card.querySelector(".view-details-btn").href = `/trips/${trip.id}`;
+
+        card.querySelector(".route-name").textContent = trip.name;
+        card.querySelector(".route-region").textContent = trip.region;
+        card.querySelector(".start-station").textContent = trip.startStation;
+        card.querySelector(".end-station").textContent = trip.endStation;
+        card.querySelector(".duration-value").textContent = trip.duration;
+        card.querySelector(".distance-value").textContent = trip.distance;
+
+        card.querySelector(".season-badge").classList.add(`season-${trip.bestSeason}`);
+        card.querySelector(".season-value").textContent = trip.bestSeason;
+
+        card.querySelector(".route-description").textContent = trip.description;
+
+        const highlightsList = card.querySelector(".highlights-list");
+        (trip.highlights || []).forEach((highlight) => {
+            const tag = document.createElement("span");
+            tag.classList.add("highlight-tag");
+            tag.textContent = highlight;
+            highlightsList.appendChild(tag);
+        });
+
+        fragment.appendChild(card);
+
+    });
+    return fragment;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
-    hookRegionSorter();
-    hookSeasonSorter();
     hookTrainsCatalog();
+    hookTripGrid();
 });

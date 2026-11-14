@@ -3,6 +3,7 @@ import { trainsApi, trainsPage } from './trains.js';
 import { Router } from 'express';
 import { homePage, aboutPage, testErrorPage } from './index.js';
 import apiRouter from './api-routes.js';
+import routerEjs from './ejs-routes.js';
 
 const router = Router();
 
@@ -25,5 +26,7 @@ router.use('/trips', railTripsRouter);
 router.get('/500', testErrorPage);
 
 router.use('/api', apiRouter);
+
+router.use('/trips', routerEjs);
 
 export default router;
