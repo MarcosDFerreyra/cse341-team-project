@@ -4,6 +4,13 @@ import {
   getAllTrains as findAllTrains,
 } from "../models/trains.js";
 
+// EJS controller: renders the page only. The train cards are filled in
+// by public/js/main.js, which calls GET /api/trains in the browser.
+export function trainsPage(req, res) {
+  return res.render("trains", { title: "Trains" });
+}
+
+// API controller: GET /api/trains/:id
 export async function getTrainById(req, res) {
   try {
     const { id } = req.params;
@@ -26,11 +33,14 @@ export async function getTrainById(req, res) {
   }
 }
 
+// API controller: GET /api/trains
+// The list is wrapped in { trains } because the trains page and the tests
+// already read payload.trains.
 export async function getAllTrains(req, res) {
   try {
     const trains = await findAllTrains();
 
-    return res.status(200).json(trains);
+    return res.status(200).json({ trains });
   } catch (error) {
     console.error("Error fetching trains:", error);
 
