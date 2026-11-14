@@ -1,4 +1,5 @@
 import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
 import dns from 'node:dns';
 if (process.env.DNS_SERVERS) {
   dns.setServers(process.env.DNS_SERVERS.split(','));
@@ -21,6 +22,11 @@ const connectToDb = async (options = {}) => {
   client = new MongoClient(connectionString);
   await client.connect();
   database = client.db(databaseName);
+
+  // Mongoose uses its own connection to the same database. Models in src/models
+  // use it, while code that still uses getDb() keeps working until it is refactored.
+  await mongoose.connect(connectionString, { dbName: databaseName });
+
   return database;
 };
 
@@ -37,6 +43,7 @@ const closeDb = async () => {
     client = undefined;
     database = undefined;
   }
+  await mongoose.disconnect();
 };
 
 export { closeDb, connectToDb, getDb };
