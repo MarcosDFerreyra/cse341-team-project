@@ -368,3 +368,33 @@ article.route-detail {
         }
     }
 }
+
+/* Month filter and loading/empty/error messages for the API-powered schedules */
+article.route-detail .route-schedules {
+    .schedule-filter {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-bottom: var(--space-md);
+
+        select {
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--clr-surface);
+            border: 1px solid var(--clr-border-light);
+            border-radius: var(--radius-md);
+            color: var(--clr-text-primary);
+            font: inherit;
+        }
+    }
+
+    .schedules-state {
+        padding: var(--space-md);
+        text-align: center;
+        color: var(--clr-text-muted);
+    }
+
+    .schedules-error {
+        color: var(--clr-text-primary);
+        font-weight: 500;
+    }
+}
