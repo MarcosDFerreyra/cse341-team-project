@@ -1,7 +1,17 @@
 import { MongoClient } from 'mongodb';
-
+import mongoose from 'mongoose';
+import dns from 'node:dns';
+if (process.env.DNS_SERVERS) {
+  dns.setServers(process.env.DNS_SERVERS.split(','));
+}
 let database;
 let client;
+
+const connectToMongoose = async (options = {}) => {
+  const connectionString = options.connectionString || process.env.MONGODB_URI;
+  const databaseName = options.databaseName || process.env.MONGODB_DB_NAME ;
+  await mongoose.connect(connectionString, { dbName: databaseName });
+}
 
 const connectToDb = async (options = {}) => {
   if (database) {
@@ -9,7 +19,7 @@ const connectToDb = async (options = {}) => {
   }
 
   const connectionString = options.connectionString || process.env.MONGODB_URI;
-  const databaseName = options.databaseName || process.env.MONGODB_DB_NAME || 'practice';
+  const databaseName = options.databaseName || process.env.MONGODB_DB_NAME;
 
   if (!connectionString) {
     throw new Error('MONGODB_URI is required.');
@@ -18,6 +28,9 @@ const connectToDb = async (options = {}) => {
   client = new MongoClient(connectionString);
   await client.connect();
   database = client.db(databaseName);
+
+  await connectToMongoose(options);
+
   return database;
 };
 
@@ -34,6 +47,7 @@ const closeDb = async () => {
     client = undefined;
     database = undefined;
   }
+  await mongoose.disconnect();
 };
 
 export { closeDb, connectToDb, getDb };
