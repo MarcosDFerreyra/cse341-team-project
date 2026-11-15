@@ -30,12 +30,10 @@ const getTripByIdApi = async (req, res) => {
 
 const tripDetails = async (req, res) => {
     const { tripId } = req.params;
-    const db = getDb();
     const details = await getTripById(tripId);
     if (!details) {
         return res.status(404).render('errors/404', { title: 'Page Not Found' });
     }
-    details.schedules = await db.collection('schedules').find({ tripId }).toArray();
 
     return res.render('trips/details', {
         title: 'Trip Details',
