@@ -1,3 +1,4 @@
+
 const hookTrainsCatalog = async () => {
     const listEl = document.getElementById('trains-list');
     const templateEl = document.getElementById('train-card-template');
@@ -169,7 +170,85 @@ const renderTrips = (trips) => {
     return fragment;
 };
 
+// Load station information when a user clicks the station information button.
+const hookStationDetails = () => {
+    const buttons = document.querySelectorAll('.station-info-btn');
+
+    buttons.forEach((button) => {
+        button.addEventListener('click', async () => {
+            const stationId = button.dataset.stationId;
+            const details = button.nextElementSibling;
+
+            // Close the station information if it is already open.
+            if (!details.hidden) {
+                details.hidden = true;
+                button.setAttribute('aria-expanded', 'false');
+                return;
+            }
+
+            details.hidden = false;
+            button.setAttribute('aria-expanded', 'true');
+
+            // Use the previously loaded information instead of making another request.
+            if (details.dataset.loaded === 'true') {
+                return;
+            }
+
+            const loading = document.createElement('p');
+            loading.className = 'station-details-loading';
+            loading.textContent = 'Loading station information...';
+            details.replaceChildren(loading);
+
+            try {
+                const response = await fetch(
+                    `/api/stations/${encodeURIComponent(stationId)}`
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load station (${response.status})`);
+                }
+
+                const station = await response.json();
+
+                const heading = document.createElement('h4');
+                heading.textContent = station.name;
+
+                const prefecture = document.createElement('p');
+                prefecture.textContent = `Prefecture: ${station.prefecture}`;
+
+                const region = document.createElement('p');
+                region.textContent = `Region: ${station.region}`;
+
+                const facilities = document.createElement('p');
+                facilities.textContent =
+                    `Facilities: ${(station.facilities || []).join(', ')}`;
+
+                const description = document.createElement('p');
+                description.textContent = station.description;
+
+                details.replaceChildren(
+                    heading,
+                    prefecture,
+                    region,
+                    facilities,
+                    description
+                );
+
+                details.dataset.loaded = 'true';
+            } catch (error) {
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'station-details-error';
+                errorMessage.textContent =
+                    'Unable to load station information. Please try again.';
+
+                details.replaceChildren(errorMessage);
+            }
+        });
+    });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     hookTrainsCatalog();
     hookTripGrid();
+    hookStationDetails();
 });
