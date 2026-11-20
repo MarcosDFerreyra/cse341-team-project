@@ -4,6 +4,7 @@ import { Router } from 'express';
 import { homePage, aboutPage, testErrorPage } from './index.js';
 import apiRouter from './api-routes.js';
 import routerEjs from './ejs-routes.js';
+import authRouter from './auth.js';
 
 const router = Router();
 
@@ -28,5 +29,7 @@ router.get('/500', testErrorPage);
 router.use('/api', apiRouter);
 
 router.use('/trips', routerEjs);
+
+router.use("/", authRouter)
 
 export default router;
