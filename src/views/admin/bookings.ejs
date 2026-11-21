@@ -1,0 +1,80 @@
+<%- include('../partials/header') %>
+
+<section class="booking-admin">
+    <h1>Booking admin</h1>
+    <p class="booking-admin-intro">
+        <% if (isAdminUser) { %>
+            You are an admin, so you can see and change every booking.
+        <% } else { %>
+            You can see and change the bookings where your email is one of the passengers.
+        <% } %>
+    </p>
+
+    <p class="booking-admin-status" id="bookings-status" role="status" aria-live="polite"></p>
+    <div class="booking-admin-state" id="bookings-loading">Loading bookings...</div>
+    <div class="booking-admin-state booking-admin-error" id="bookings-error" hidden></div>
+    <div class="booking-admin-state" id="bookings-empty" hidden>No bookings found.</div>
+
+    <table class="booking-admin-table" id="bookings-table" hidden>
+        <thead>
+            <tr>
+                <th scope="col">Booking</th>
+                <th scope="col">Trip</th>
+                <th scope="col">Day</th>
+                <th scope="col">Class</th>
+                <th scope="col">Passengers</th>
+                <th scope="col">Booked on</th>
+                <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+        </thead>
+        <tbody id="bookings-list"></tbody>
+    </table>
+
+    <template id="booking-row-template">
+        <tr>
+            <td data-field="id"></td>
+            <td data-field="trip"></td>
+            <td data-field="day"></td>
+            <td data-field="class"></td>
+            <td data-field="passengers"></td>
+            <td data-field="created"></td>
+            <td class="booking-admin-actions">
+                <button type="button" data-action="edit">Edit</button>
+                <button type="button" data-action="delete" class="booking-admin-danger">Delete</button>
+            </td>
+        </tr>
+    </template>
+
+    <dialog id="booking-edit-dialog" class="booking-admin-dialog">
+        <form id="booking-edit-form" method="dialog">
+            <h2>Edit booking <span id="edit-booking-id"></span></h2>
+
+            <label for="edit-ticket-class">Ticket class</label>
+            <select id="edit-ticket-class" name="ticketClass">
+                <% ticketClasses.forEach((ticketClass) => { %>
+                    <option value="<%= ticketClass %>"><%= ticketClass %></option>
+                <% }) %>
+            </select>
+
+            <label for="edit-selected-day">Travel day</label>
+            <select id="edit-selected-day" name="selectedDay">
+                <% daysOfWeek.forEach((day) => { %>
+                    <option value="<%= day %>"><%= day %></option>
+                <% }) %>
+            </select>
+
+            <div id="edit-passengers"></div>
+
+            <p class="booking-admin-error" id="edit-error" hidden></p>
+
+            <div class="booking-admin-dialog-buttons">
+                <button type="submit" value="save">Save changes</button>
+                <button type="button" id="edit-cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+</section>
+
+<script src="/js/booking-admin.js" defer></script>
+
+<%- include('../partials/footer') %>

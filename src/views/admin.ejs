@@ -1,5 +1,10 @@
 <%- include('./partials/header') %>
     <h1> Welcome to the Admin Dashboard</h1>
+    <nav aria-label="Admin pages">
+        <ul>
+            <li><a href="/admin/bookings">Manage bookings</a></li>
+        </ul>
+    </nav>
     <form action="/logout" method="post">
         <button type="submit">Logout</button>
     </form>

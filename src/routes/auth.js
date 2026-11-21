@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { register, login, logout } from '../controllers/users.js';
+import { bookingAdminPage } from '../controllers/bookings.js';
 import {
     requireApiLogin,
     requireApiRole,
@@ -26,5 +27,9 @@ authRouter.post('/logout', logout);
 authRouter.get("/admin", requirePageRole("admin"), (req, res) => {
     res.render("admin", {title: "Admin Dashboard"})
 })
+
+// Booking admin page: any signed-in user. Admins see all bookings,
+// customers see only their own (the API decides which bookings to send).
+authRouter.get('/admin/bookings', requirePageLogin, bookingAdminPage);
 
 export default authRouter;
