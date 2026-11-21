@@ -1,8 +1,6 @@
 
 import { Router } from 'express';
 import { getAllTripsApi, getTripByIdApi } from '../controllers/trips.js';
-import { getAllStations, getStationById } from '../controllers/stations.js';
-
 
 const apiRouter = Router();
 
@@ -139,6 +137,38 @@ const apiRouter = Router();
 
 /**
  * @openapi
+ * components:
+ *   schemas:
+ *     Schedule:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 1
+ *         tripId:
+ *           type: string
+ *           example: alpine-panorama
+ *         departureTime:
+ *           type: string
+ *           description: 24-hour time in HH:MM format
+ *           example: '08:30'
+ *         arrivalTime:
+ *           type: string
+ *           description: 24-hour time in HH:MM format
+ *           example: '13:00'
+ *         daysOfWeek:
+ *           type: array
+ *           items:
+ *             type: string
+ *             enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+ *           example: [monday, tuesday, wednesday, thursday, friday]
+ *         status:
+ *           type: boolean
+ *           example: true
+ */
+
+/**
+ * @openapi
  * /api/trips:
  *   get:
  *     summary: Get all trips
@@ -204,53 +234,5 @@ apiRouter.get('/trips', getAllTripsApi);
  *               error: Internal server error
  */
 apiRouter.get('/trips/:id', getTripByIdApi);
-
-
-/**
- * @openapi
- * /api/stations:
- *   get:
- *     summary: Get all stations
- *     tags: [Stations]
- *     responses:
- *       200:
- *         description: List of all stations
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Station'
- *       500:
- *         description: Internal server error
- */
-apiRouter.get('/stations', getAllStations);
-
-/**
- * @openapi
- * /api/stations/{id}:
- *   get:
- *     summary: Get a station by ID
- *     tags: [Stations]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Station found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Station'
- *       404:
- *         description: Station not found
- *       500:
- *         description: Internal server error
- */
-apiRouter.get('/stations/:id', getStationById);
-
 
 export default apiRouter;
