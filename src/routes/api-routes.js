@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { getAllTripsApi, getTripByIdApi } from '../controllers/trips.js';
 import { getSchedulesForTrip, getSchedulesForTripAndMonth } from '../controllers/schedules.js';
+import { getBookingsApi, updateBookingApi, deleteBookingApi } from '../controllers/bookings.js';
+import { requireApiLogin } from '../middleware/auth.js';
 
 const apiRouter = Router();
 
@@ -269,5 +271,226 @@ const getTripSchedules = (req, res) => {
 };
 
 apiRouter.get('/trips/:id/schedules', getTripSchedules);
+
+/**
+ * @openapi
+ * tags:
+ *   - name: Bookings
+ *     description: Bookings (confirmations). Requires a signed-in session. Admins can see and change every booking; customers only the bookings where their email is a passenger.
+ *
+ * components:
+ *   schemas:
+ *     Passenger:
+ *       type: object
+ *       required: [firstName, lastName, email]
+ *       properties:
+ *         firstName:
+ *           type: string
+ *           example: Yuki
+ *         lastName:
+ *           type: string
+ *           example: Tanaka
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: yuki.tanaka@example.com
+ *         phone:
+ *           type: string
+ *           example: +81 120-555-1234
+ *     Booking:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: Confirmation code
+ *           example: JRAB12CD34
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: '2026-11-20T15:30:00.000Z'
+ *         scheduleId:
+ *           type: string
+ *           example: '1'
+ *         tripId:
+ *           type: string
+ *           example: alpine-panorama
+ *         ticketClass:
+ *           type: string
+ *           enum: [standard, premium, first]
+ *           example: standard
+ *         selectedDay:
+ *           type: string
+ *           enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+ *           example: monday
+ *         passengers:
+ *           type: array
+ *           minItems: 1
+ *           maxItems: 8
+ *           items:
+ *             $ref: '#/components/schemas/Passenger'
+ *     BookingUpdate:
+ *       type: object
+ *       description: Send at least one of these fields. Other fields are ignored.
+ *       properties:
+ *         ticketClass:
+ *           type: string
+ *           enum: [standard, premium, first]
+ *         selectedDay:
+ *           type: string
+ *           enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+ *         passengers:
+ *           type: array
+ *           minItems: 1
+ *           maxItems: 8
+ *           items:
+ *             $ref: '#/components/schemas/Passenger'
+ *       example:
+ *         ticketClass: premium
+ *         selectedDay: friday
+ *     AuthError:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *       example:
+ *         message: Authentication required
+ */
+
+/**
+ * @openapi
+ * /api/bookings:
+ *   get:
+ *     summary: Get the bookings the signed-in user can see
+ *     description: Admins get every booking. Customers get only the bookings where their email matches a passenger email (not case-sensitive). Newest first.
+ *     tags: [Bookings]
+ *     responses:
+ *       200:
+ *         description: A list of bookings (can be empty)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Booking'
+ *       401:
+ *         description: Not signed in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthError'
+ *       500:
+ *         description: Unexpected server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+apiRouter.get('/bookings', requireApiLogin, getBookingsApi);
+
+/**
+ * @openapi
+ * /api/bookings/{id}:
+ *   put:
+ *     summary: Update a booking
+ *     description: Admins can update any booking. Customers can update only bookings where they are a passenger.
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Confirmation code of the booking
+ *         schema:
+ *           type: string
+ *         example: JRAB12CD34
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/BookingUpdate'
+ *     responses:
+ *       200:
+ *         description: The updated booking
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Booking'
+ *       400:
+ *         description: The request body is not valid
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: Invalid booking data
+ *               details: ['ticketClass must be one of: standard, premium, first']
+ *       401:
+ *         description: Not signed in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthError'
+ *       403:
+ *         description: The user is not an admin and is not a passenger on this booking
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: You can only change bookings where you are a passenger
+ *       404:
+ *         description: No booking with this id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: Booking not found
+ *       500:
+ *         description: Unexpected server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *   delete:
+ *     summary: Delete a booking
+ *     description: Admins can delete any booking. Customers can delete only bookings where they are a passenger.
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Confirmation code of the booking
+ *         schema:
+ *           type: string
+ *         example: JRAB12CD34
+ *     responses:
+ *       204:
+ *         description: The booking was deleted
+ *       401:
+ *         description: Not signed in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthError'
+ *       403:
+ *         description: The user is not an admin and is not a passenger on this booking
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: No booking with this id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Unexpected server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+apiRouter.put('/bookings/:id', requireApiLogin, updateBookingApi);
+apiRouter.delete('/bookings/:id', requireApiLogin, deleteBookingApi);
 
 export default apiRouter;
