@@ -1,6 +1,6 @@
+
 import { Router } from 'express';
 import { getAllTripsApi, getTripByIdApi } from '../controllers/trips.js';
-import { getSchedulesForTrip, getSchedulesForTripAndMonth } from '../controllers/schedules.js';
 
 const apiRouter = Router();
 
@@ -9,6 +9,8 @@ const apiRouter = Router();
  * tags:
  *   - name: Trips
  *     description: Rail trips offered by Kizuna Rail
+ *   - name: Stations
+ *     description: Railway stations available in Kizuna Rail
  *
  * components:
  *   schemas:
@@ -88,6 +90,40 @@ const apiRouter = Router();
  *           type: string
  *           description: Alternative text for the trip image
  *           example: Alpine Panorama Express train in the Japanese Alps
+ *
+ *     Station:
+ *       type: object
+ *       required:
+ *         - id
+ *         - name
+ *         - prefecture
+ *         - region
+ *         - facilities
+ *         - description
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: nagoya
+ *         name:
+ *           type: string
+ *           example: Nagoya Station
+ *         prefecture:
+ *           type: string
+ *           example: Aichi
+ *         region:
+ *           type: string
+ *           example: central
+ *         facilities:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example:
+ *             - restaurant
+ *             - shop
+ *             - restroom
+ *         description:
+ *           type: string
+ *           example: Major transportation hub in central Japan.
  *
  *     Error:
  *       type: object
@@ -198,76 +234,5 @@ apiRouter.get('/trips', getAllTripsApi);
  *               error: Internal server error
  */
 apiRouter.get('/trips/:id', getTripByIdApi);
-
-/**
- * @openapi
- * /api/trips/{id}/schedules:
- *   get:
- *     summary: Get the schedules for a trip
- *     description: >
- *       Returns the schedules for a trip, sorted by departure time. If the month
- *       query parameter is included, returns the schedules only when the trip
- *       operates in that month; otherwise the list is empty.
- *     tags:
- *       - Schedules
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: The trip id (for example, alpine-panorama)
- *         schema:
- *           type: string
- *       - in: query
- *         name: month
- *         required: false
- *         description: Month number from 1 (January) to 12 (December)
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 12
- *     responses:
- *       200:
- *         description: A list of schedules (empty if the trip has none for the requested month)
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Schedule'
- *       400:
- *         description: The month query parameter is not a whole number from 1 to 12
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: month must be a whole number from 1 to 12
- *       404:
- *         description: No trip exists with that id
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: Trip not found
- *       500:
- *         description: Unexpected server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *             example:
- *               error: Failed to fetch schedules
- */
-const getTripSchedules = (req, res) => {
-    // The same URL serves both controller functions; the month parameter picks one.
-    if (req.query.month !== undefined) {
-        return getSchedulesForTripAndMonth(req, res);
-    }
-
-    return getSchedulesForTrip(req, res);
-};
-
-apiRouter.get('/trips/:id/schedules', getTripSchedules);
 
 export default apiRouter;
