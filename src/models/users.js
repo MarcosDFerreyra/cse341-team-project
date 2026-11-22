@@ -22,8 +22,12 @@ const findUserByEmail = async (email) => {
     return await User.findOne({ email }).populate("role");
 }
 
+const findUserById = async (id) => {
+    return await User.findById(id);
+};
+
 const verifyPassword = async (password, password_hash) => {
     return bcrypt.compare(password, password_hash);
 }
 export {
-    createUser, findUserByEmail, verifyPassword};
+    createUser, findUserByEmail, findUserById, verifyPassword};

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { register, login, logout } from '../controllers/users.js';
+import { dashboardPage } from '../controllers/dashboard.js';
 import {
     requireApiLogin,
     requireApiRole,
@@ -21,6 +22,9 @@ authRouter.get('/login', (req, res) => {
 authRouter.post('/register', register);
 authRouter.post('/login', login);
 authRouter.post('/logout', logout);
+
+// standard user dashboard
+authRouter.get('/dashboard', requirePageLogin, dashboardPage);
 
 // admin routes
 authRouter.get("/admin", requirePageRole("admin"), (req, res) => {

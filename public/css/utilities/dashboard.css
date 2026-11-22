@@ -1,0 +1,113 @@
+.dashboard-page {
+    display: grid;
+    gap: var(--space-xl);
+    padding-block: var(--space-lg);
+
+    h1 {
+        margin: 0;
+    }
+
+    h2 {
+        margin: 0 0 var(--space-sm);
+    }
+
+    .dashboard-note {
+        margin: 0 0 var(--space-md);
+        color: var(--clr-text-muted);
+    }
+
+    .dashboard-state {
+        padding: var(--space-md);
+        text-align: center;
+        color: var(--clr-text-muted);
+    }
+
+    .dashboard-error {
+        color: var(--clr-text-primary);
+        font-weight: 500;
+    }
+
+    .bookings-list {
+        display: grid;
+        gap: var(--space-md);
+    }
+
+    .booking-card {
+        display: grid;
+        gap: var(--space-sm);
+        padding: var(--space-md) var(--space-lg);
+        background-color: var(--clr-surface);
+        border: 1px solid var(--clr-border-light);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+
+        .booking-card-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: var(--space-sm);
+
+            h3 {
+                margin: 0;
+            }
+        }
+
+        .booking-reference {
+            font-family: 'Roboto Mono', monospace;
+            font-size: var(--font-size-sm);
+            color: var(--clr-text-muted);
+        }
+
+        .booking-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md) var(--space-xl);
+            margin: 0;
+
+            div {
+                display: grid;
+            }
+
+            dt {
+                font-size: var(--font-size-sm);
+                color: var(--clr-text-muted);
+            }
+
+            dd {
+                margin: 0;
+                font-weight: 500;
+            }
+
+            .capitalize {
+                text-transform: capitalize;
+            }
+        }
+    }
+
+    .dashboard-links {
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        a {
+            display: inline-block;
+            padding: var(--space-sm) var(--space-lg);
+            background-color: var(--clr-surface);
+            border: 1px solid var(--clr-border);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            text-decoration: none;
+
+            &:hover {
+                background-color: var(--clr-primary-pale);
+                border-color: var(--clr-primary-light);
+            }
+        }
+    }
+}

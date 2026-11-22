@@ -1,5 +1,6 @@
 
 import { createUser, findUserByEmail, verifyPassword } from "../models/users.js";
+import { getDashboardPath } from "../includes/helpers.js";
 
 const register = async (req, res, next) => {
     const { display_name, username, email, password } = req.body
@@ -32,7 +33,7 @@ const login = async (req, res, next) => {
             display_name: user.display_name,
             role: user.role.name
         };
-        return res.redirect("/");
+        return res.redirect(getDashboardPath(user.role.name));
     } catch (error) {
         return next(error);
     }
