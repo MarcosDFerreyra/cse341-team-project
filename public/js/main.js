@@ -51,7 +51,7 @@ const hookTrainsCatalog = async () => {
             errorEl.textContent = 'Unable to load trains right now. Please try again in a moment.';
         }
     }
-}
+};
 
 const hookTripSchedules = async () => {
     const listEl = document.getElementById('schedules-list');
@@ -184,9 +184,10 @@ const applyFilters = (trips) => {
     const regionSelect = document.getElementById('region-filter');
     const seasonSelect = document.getElementById('season-filter');
     const list = document.getElementById('trips-list');
+
     if (regionSelect && seasonSelect) {
         const region = regionSelect.value;
-        const season = seasonSelect.value
+        const season = seasonSelect.value;
         const filter = trips.filter((trip) =>
             (region === 'all' || trip.region === region) &&
             (season === 'all' || trip.bestSeason === season)
@@ -210,11 +211,10 @@ const applyFilters = (trips) => {
 
         history.replaceState(null, '', url);
     }
-
 };
 
 const fetchTrips = async () => {
-    const response = await fetch("/api/trips")
+    const response = await fetch("/api/trips");
     if (!response.ok)
         throw new Error(`failed to load trips (${response.status})`);
 
@@ -256,8 +256,8 @@ const renderTrips = (trips) => {
         });
 
         fragment.appendChild(card);
-
     });
+
     return fragment;
 };
 

@@ -446,3 +446,42 @@ article.route-detail .route-schedules {
         font-weight: 500;
     }
 }
+
+/* Station information button and expandable details */
+article.route-detail .route-info .route-stations .stations .station {
+    .station-info-btn {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-sm);
+        background-color: var(--clr-primary);
+        color: var(--clr-text-alt-primary);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .station-info-btn:hover {
+        background-color: var(--clr-accent);
+    }
+
+    .station-details {
+        margin-top: var(--space-sm);
+        padding: var(--space-md);
+        background-color: var(--clr-surface-alt);
+        border: 1px solid var(--clr-border-light);
+        border-radius: var(--radius-md);
+    }
+
+    .station-details[hidden] {
+        display: none;
+    }
+
+    .station-details-loading {
+        color: var(--clr-text-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    .station-details-error {
+        color: var(--clr-text-secondary);
+        font-size: var(--font-size-sm);
+    }
+}

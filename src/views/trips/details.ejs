@@ -67,17 +67,20 @@
                         <span class="station-name">
                             <%= details.startStation.charAt(0).toUpperCase() + details.startStation.slice(1) %>
                         </span>
+
                         <button type="button" class="station-info-btn" data-station-id="<%= details.startStation %>"
                             aria-expanded="false">
                             Station Information
                         </button>
                         <div class="station-details" hidden></div>
                     </div>
+
                     <div class="station">
                         <span class="station-label">End</span>
                         <span class="station-name">
                             <%= details.endStation.charAt(0).toUpperCase() + details.endStation.slice(1) %>
                         </span>
+
                         <button type="button" class="station-info-btn" data-station-id="<%= details.endStation %>"
                             aria-expanded="false">
                             Station Information
@@ -98,35 +101,50 @@
                 </div>
             </div>
 
-        <% if (details.schedules && details.schedules.length > 0) { %>
-        <div class="route-schedules">
-            <h2>Available Schedules</h2>
-            <div class="schedules-grid">
-                <% details.schedules.forEach(function(schedule) { %>
-                <div class="schedule-card">
-                    <div class="schedule-times">
-                        <div class="time-block">
-                            <span class="time-label">Departs</span>
-                            <span class="time-value"><%= schedule.departureTime %></span>
-                        </div>
-                        <span class="time-arrow">→</span>
-                        <div class="time-block">
-                            <span class="time-label">Arrives</span>
-                            <span class="time-value"><%= schedule.arrivalTime %></span>
-                        </div>
+            <% const monthNames=['January', 'February' , 'March' , 'April' , 'May' , 'June' , 'July' , 'August'
+                , 'September' , 'October' , 'November' , 'December' ]; %>
+                <div class="route-schedules">
+                    <h2>Available Schedules</h2>
+
+                    <div class="schedule-filter">
+                        <label for="schedule-month-filter">Month</label>
+                        <select id="schedule-month-filter">
+                            <option value="">All months</option>
+                            <% details.operatingMonths.forEach(function(month) { %>
+                                <option value="<%= month %>">
+                                    <%= monthNames[month - 1] || month %>
+                                </option>
+                                <% }); %>
+                        </select>
                     </div>
-                    <div class="schedule-days">
-                        <% schedule.daysOfWeek.forEach(function(day) { %>
-                        <span class="day-badge"><%= day.substring(0, 3) %></span>
-                        <% }); %>
+
+                    <div class="schedules-state" id="schedules-loading">Loading schedules...</div>
+                    <div class="schedules-state" id="schedules-empty" hidden>No schedules are available for this
+                        selection.</div>
+                    <div class="schedules-state schedules-error" id="schedules-error" hidden></div>
+
+                    <div class="schedules-grid" id="schedules-list" data-trip-id="<%= details.id %>" aria-live="polite">
                     </div>
-                    <a href="/trips/booking/<%= schedule.id %>" class="book-btn">Book Now</a>
+
+                    <template id="schedule-card-template">
+                        <div class="schedule-card">
+                            <div class="schedule-times">
+                                <div class="time-block">
+                                    <span class="time-label">Departs</span>
+                                    <span class="time-value" data-field="departure"></span>
+                                </div>
+                                <span class="time-arrow">→</span>
+                                <div class="time-block">
+                                    <span class="time-label">Arrives</span>
+                                    <span class="time-value" data-field="arrival"></span>
+                                </div>
+                            </div>
+                            <div class="schedule-days" data-field="days"></div>
+                            <a href="#" class="book-btn" data-field="book-link">Book Now</a>
+                        </div>
+                    </template>
                 </div>
-                <% }); %>
-            </div>
         </div>
-        <% } %>
-    </div>
-</article>
+    </article>
 
     <%- include('../partials/footer') %>

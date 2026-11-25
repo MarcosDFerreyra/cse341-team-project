@@ -1,6 +1,8 @@
 
 import { Router } from 'express';
 import { getAllTripsApi, getTripByIdApi } from '../controllers/trips.js';
+import { getSchedulesForTrip, getSchedulesForTripAndMonth } from '../controllers/schedules.js';
+import { getAllStations, getStationById } from '../controllers/stations.js';
 
 const apiRouter = Router();
 
@@ -234,5 +236,122 @@ apiRouter.get('/trips', getAllTripsApi);
  *               error: Internal server error
  */
 apiRouter.get('/trips/:id', getTripByIdApi);
+
+/**
+ * @openapi
+ * /api/stations:
+ *   get:
+ *     summary: Get all stations
+ *     tags: [Stations]
+ *     responses:
+ *       200:
+ *         description: List of all stations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Station'
+ *       500:
+ *         description: Internal server error
+ */
+apiRouter.get('/stations', getAllStations);
+
+/**
+ * @openapi
+ * /api/stations/{id}:
+ *   get:
+ *     summary: Get a station by ID
+ *     tags: [Stations]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Station found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Station'
+ *       404:
+ *         description: Station not found
+ *       500:
+ *         description: Internal server error
+ */
+apiRouter.get('/stations/:id', getStationById);
+
+/**
+ * @openapi
+ * /api/trips/{id}/schedules:
+ *   get:
+ *     summary: Get the schedules for a trip
+ *     description: >
+ *       Returns the schedules for a trip, sorted by departure time. If the month
+ *       query parameter is included, returns the schedules only when the trip
+ *       operates in that month; otherwise the list is empty.
+ *     tags:
+ *       - Schedules
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The trip id (for example, alpine-panorama)
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: month
+ *         required: false
+ *         description: Month number from 1 (January) to 12 (December)
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 12
+ *     responses:
+ *       200:
+ *         description: A list of schedules (empty if the trip has none for the requested month)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Schedule'
+ *       400:
+ *         description: The month query parameter is not a whole number from 1 to 12
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: month must be a whole number from 1 to 12
+ *       404:
+ *         description: No trip exists with that id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: Trip not found
+ *       500:
+ *         description: Unexpected server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: Failed to fetch schedules
+ */
+const getTripSchedules = (req, res) => {
+    // The same URL serves both controller functions; the month parameter picks one.
+    if (req.query.month !== undefined) {
+        return getSchedulesForTripAndMonth(req, res);
+    }
+
+    return getSchedulesForTrip(req, res);
+};
+
+apiRouter.get('/trips/:id/schedules', getTripSchedules);
 
 export default apiRouter;
