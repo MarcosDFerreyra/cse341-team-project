@@ -128,7 +128,6 @@ article.route-detail {
         }
 
         .route-stations {
-
             .stations {
                 display: flex;
                 flex-direction: column;
@@ -156,12 +155,61 @@ article.route-detail {
                         font-weight: 500;
                         color: var(--clr-primary);
                     }
+
+                    /* Keeps the station name and information button on the same line. */
+                    .station-name-row {
+                        display: flex;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        gap: var(--space-sm);
+                    }
+
+                    /* Makes the information button smaller than the main page buttons. */
+                    .station-info-btn {
+                        padding: var(--space-xs) var(--space-sm);
+                        font-size: var(--font-size-sm);
+                        background-color: var(--clr-primary);
+                        color: var(--clr-text-alt-primary);
+                        border: 1px solid var(--clr-border);
+                        border-radius: var(--radius-sm);
+                        box-shadow: var(--shadow-sm);
+                    }
+
+                    /* Gives the button a subtle hover effect using the existing theme. */
+                    .station-info-btn:hover {
+                        background-color: var(--clr-accent);
+                    }
+
+                    /* Shows the station information in a separate section. */
+                    .station-details {
+                        margin-top: var(--space-sm);
+                        padding: var(--space-md);
+                        background-color: var(--clr-surface-alt);
+                        border: 1px solid var(--clr-border-light);
+                        border-radius: var(--radius-md);
+                    }
+
+                    /* Keeps hidden station information out of the page layout. */
+                    .station-details[hidden] {
+                        display: none;
+                    }
+
+                    /* Styles the loading message while station information is being fetched. */
+                    .station-details-loading {
+                        color: var(--clr-text-muted);
+                        font-size: var(--font-size-sm);
+                    }
+
+                    /* Makes request errors noticeable without introducing new colours. */
+                    .station-details-error {
+                        color: var(--clr-text-secondary);
+                        font-size: var(--font-size-sm);
+                    }
                 }
             }
         }
 
         .route-operating {
-
             .months-grid {
                 display: flex;
                 flex-wrap: wrap;
@@ -396,5 +444,44 @@ article.route-detail .route-schedules {
     .schedules-error {
         color: var(--clr-text-primary);
         font-weight: 500;
+    }
+}
+
+/* Station information button and expandable details */
+article.route-detail .route-info .route-stations .stations .station {
+    .station-info-btn {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-sm);
+        background-color: var(--clr-primary);
+        color: var(--clr-text-alt-primary);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .station-info-btn:hover {
+        background-color: var(--clr-accent);
+    }
+
+    .station-details {
+        margin-top: var(--space-sm);
+        padding: var(--space-md);
+        background-color: var(--clr-surface-alt);
+        border: 1px solid var(--clr-border-light);
+        border-radius: var(--radius-md);
+    }
+
+    .station-details[hidden] {
+        display: none;
+    }
+
+    .station-details-loading {
+        color: var(--clr-text-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    .station-details-error {
+        color: var(--clr-text-secondary);
+        font-size: var(--font-size-sm);
     }
 }

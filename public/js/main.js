@@ -1,3 +1,4 @@
+
 const hookTrainsCatalog = async () => {
     const listEl = document.getElementById('trains-list');
     const templateEl = document.getElementById('train-card-template');
@@ -50,7 +51,7 @@ const hookTrainsCatalog = async () => {
             errorEl.textContent = 'Unable to load trains right now. Please try again in a moment.';
         }
     }
-}
+};
 
 const hookTripSchedules = async () => {
     const listEl = document.getElementById('schedules-list');
@@ -183,9 +184,10 @@ const applyFilters = (trips) => {
     const regionSelect = document.getElementById('region-filter');
     const seasonSelect = document.getElementById('season-filter');
     const list = document.getElementById('trips-list');
+
     if (regionSelect && seasonSelect) {
         const region = regionSelect.value;
-        const season = seasonSelect.value
+        const season = seasonSelect.value;
         const filter = trips.filter((trip) =>
             (region === 'all' || trip.region === region) &&
             (season === 'all' || trip.bestSeason === season)
@@ -209,11 +211,10 @@ const applyFilters = (trips) => {
 
         history.replaceState(null, '', url);
     }
-
 };
 
 const fetchTrips = async () => {
-    const response = await fetch("/api/trips")
+    const response = await fetch("/api/trips");
     if (!response.ok)
         throw new Error(`failed to load trips (${response.status})`);
 
@@ -255,13 +256,91 @@ const renderTrips = (trips) => {
         });
 
         fragment.appendChild(card);
-
     });
+
     return fragment;
+};
+
+// Load station information when a user clicks the station information button.
+const hookStationDetails = () => {
+    const buttons = document.querySelectorAll('.station-info-btn');
+
+    buttons.forEach((button) => {
+        button.addEventListener('click', async () => {
+            const stationId = button.dataset.stationId;
+            const details = button.nextElementSibling;
+
+            // Close the station information if it is already open.
+            if (!details.hidden) {
+                details.hidden = true;
+                button.setAttribute('aria-expanded', 'false');
+                return;
+            }
+
+            details.hidden = false;
+            button.setAttribute('aria-expanded', 'true');
+
+            // Use the previously loaded information instead of making another request.
+            if (details.dataset.loaded === 'true') {
+                return;
+            }
+
+            const loading = document.createElement('p');
+            loading.className = 'station-details-loading';
+            loading.textContent = 'Loading station information...';
+            details.replaceChildren(loading);
+
+            try {
+                const response = await fetch(
+                    `/api/stations/${encodeURIComponent(stationId)}`
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load station (${response.status})`);
+                }
+
+                const station = await response.json();
+
+                const heading = document.createElement('h4');
+                heading.textContent = station.name;
+
+                const prefecture = document.createElement('p');
+                prefecture.textContent = `Prefecture: ${station.prefecture}`;
+
+                const region = document.createElement('p');
+                region.textContent = `Region: ${station.region}`;
+
+                const facilities = document.createElement('p');
+                facilities.textContent =
+                    `Facilities: ${(station.facilities || []).join(', ')}`;
+
+                const description = document.createElement('p');
+                description.textContent = station.description;
+
+                details.replaceChildren(
+                    heading,
+                    prefecture,
+                    region,
+                    facilities,
+                    description
+                );
+
+                details.dataset.loaded = 'true';
+            } catch (error) {
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'station-details-error';
+                errorMessage.textContent =
+                    'Unable to load station information. Please try again.';
+
+                details.replaceChildren(errorMessage);
+            }
+        });
+    });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     hookTrainsCatalog();
     hookTripSchedules();
     hookTripGrid();
+    hookStationDetails();
 });

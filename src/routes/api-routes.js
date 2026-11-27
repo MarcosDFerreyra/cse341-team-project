@@ -1,9 +1,10 @@
+
 import { Router } from 'express';
 import { getAllTripsApi, getTripByIdApi } from '../controllers/trips.js';
 import { getSchedulesForTrip, getSchedulesForTripAndMonth } from '../controllers/schedules.js';
+import { getAllStations, getStationById } from '../controllers/stations.js';
 import { getMyBookings } from '../controllers/bookings.js';
 import { requireApiLogin } from '../middleware/auth.js';
-
 const apiRouter = Router();
 
 /**
@@ -11,6 +12,8 @@ const apiRouter = Router();
  * tags:
  *   - name: Trips
  *     description: Rail trips offered by Kizuna Rail
+ *   - name: Stations
+ *     description: Railway stations available in Kizuna Rail
  *
  * components:
  *   schemas:
@@ -90,6 +93,40 @@ const apiRouter = Router();
  *           type: string
  *           description: Alternative text for the trip image
  *           example: Alpine Panorama Express train in the Japanese Alps
+ *
+ *     Station:
+ *       type: object
+ *       required:
+ *         - id
+ *         - name
+ *         - prefecture
+ *         - region
+ *         - facilities
+ *         - description
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: nagoya
+ *         name:
+ *           type: string
+ *           example: Nagoya Station
+ *         prefecture:
+ *           type: string
+ *           example: Aichi
+ *         region:
+ *           type: string
+ *           example: central
+ *         facilities:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example:
+ *             - restaurant
+ *             - shop
+ *             - restroom
+ *         description:
+ *           type: string
+ *           example: Major transportation hub in central Japan.
  *
  *     Error:
  *       type: object
@@ -200,6 +237,52 @@ apiRouter.get('/trips', getAllTripsApi);
  *               error: Internal server error
  */
 apiRouter.get('/trips/:id', getTripByIdApi);
+
+/**
+ * @openapi
+ * /api/stations:
+ *   get:
+ *     summary: Get all stations
+ *     tags: [Stations]
+ *     responses:
+ *       200:
+ *         description: List of all stations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Station'
+ *       500:
+ *         description: Internal server error
+ */
+apiRouter.get('/stations', getAllStations);
+
+/**
+ * @openapi
+ * /api/stations/{id}:
+ *   get:
+ *     summary: Get a station by ID
+ *     tags: [Stations]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Station found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Station'
+ *       404:
+ *         description: Station not found
+ *       500:
+ *         description: Internal server error
+ */
+apiRouter.get('/stations/:id', getStationById);
 
 /**
  * @openapi

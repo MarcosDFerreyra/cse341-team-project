@@ -1,3 +1,4 @@
+
 import express from 'express';
 import Path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,6 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
 
 const app = express();
+app.locals.NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
@@ -29,9 +31,10 @@ app.use(loadSessionUser);
 // Set up Swagger API documentation.
 swaggerUse(app);
 
-// Add version info to res.locals for access in templates.
+// Add application information to res.locals for access in templates.
 app.use((req, res, next) => {
     res.locals.appVersion = pkg.version;
+    res.locals.NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
     next();
 });
 
