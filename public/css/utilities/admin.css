@@ -1,0 +1,40 @@
+/* Admin Dashboard */
+.admin-page {
+    max-width: var(--content-max-width);
+    margin-inline: auto;
+    padding: var(--space-xl) var(--space-lg);
+
+    h1 {
+        margin-bottom: var(--space-lg);
+        color: var(--clr-text-primary);
+        font-size: var(--font-size-2xl);
+    }
+
+    a {
+        display: inline-block;
+        padding: var(--space-sm) var(--space-lg);
+        margin-bottom: var(--space-lg);
+        background: var(--clr-primary);
+        color: var(--clr-text-alt-primary);
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        transition: background 0.2s ease;
+    }
+
+    a:hover {
+        background: var(--clr-text-secondary);
+    }
+
+    form button {
+        padding: var(--space-sm) var(--space-lg);
+        background: var(--clr-surface-alt);
+        color: var(--clr-text-primary);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+    }
+
+    form button:hover {
+        background: var(--clr-primary-pale);
+    }
+}

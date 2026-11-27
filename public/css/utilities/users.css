@@ -1,0 +1,98 @@
+/* User Management Page */
+.users-page {
+    max-width: var(--content-max-width);
+    margin-inline: auto;
+    padding: var(--space-xl) var(--space-lg);
+
+    h1 {
+        margin-bottom: var(--space-lg);
+        color: var(--clr-text-primary);
+        font-size: var(--font-size-2xl);
+    }
+}
+
+#users-loading,
+#users-empty,
+#users-error {
+    padding: var(--space-lg);
+    text-align: center;
+    border-radius: var(--radius-md);
+}
+
+#users-loading,
+#users-empty {
+    background: var(--clr-surface-alt);
+    color: var(--clr-text-secondary);
+}
+
+#users-error {
+    background: #fbeaea;
+    color: #9b3d3d;
+}
+
+#users-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+.user-card {
+    padding: var(--space-lg);
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+
+    h2 {
+        margin-bottom: var(--space-md);
+        color: var(--clr-text-primary);
+        font-size: var(--font-size-lg);
+    }
+
+    p {
+        margin-bottom: var(--space-sm);
+        color: var(--clr-text-secondary);
+        overflow-wrap: anywhere;
+    }
+
+    button {
+        padding: var(--space-xs) var(--space-md);
+        margin: var(--space-sm) var(--space-xs) 0 0;
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-sm);
+        background: var(--clr-surface-alt);
+        color: var(--clr-text-primary);
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: var(--clr-primary-pale);
+    }
+
+    form {
+        margin-top: var(--space-md);
+    }
+
+    label {
+        display: block;
+        margin-top: var(--space-md);
+        color: var(--clr-text-secondary);
+    }
+
+    input {
+        width: 100%;
+        padding: var(--space-sm);
+        margin-top: var(--space-xs);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-sm);
+        font: inherit;
+        color: var(--clr-text-primary);
+        background: var(--clr-background);
+    }
+
+    input:focus {
+        outline: 2px solid var(--clr-primary-light);
+        border-color: var(--clr-primary);
+    }
+}
