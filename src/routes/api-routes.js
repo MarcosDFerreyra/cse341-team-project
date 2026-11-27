@@ -3,7 +3,8 @@ import { Router } from 'express';
 import { getAllTripsApi, getTripByIdApi } from '../controllers/trips.js';
 import { getSchedulesForTrip, getSchedulesForTripAndMonth } from '../controllers/schedules.js';
 import { getAllStations, getStationById } from '../controllers/stations.js';
-
+import { getMyBookings } from '../controllers/bookings.js';
+import { requireApiLogin } from '../middleware/auth.js';
 const apiRouter = Router();
 
 /**
@@ -353,5 +354,79 @@ const getTripSchedules = (req, res) => {
 };
 
 apiRouter.get('/trips/:id/schedules', getTripSchedules);
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     MyBooking:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: Booking reference
+ *           example: JR4K2M9XQ
+ *         tripId:
+ *           type: string
+ *           example: alpine-panorama
+ *         tripName:
+ *           type: string
+ *           example: Alpine Panorama Express
+ *         ticketClass:
+ *           type: string
+ *           example: standard
+ *         selectedDay:
+ *           type: string
+ *           example: monday
+ *         passengerCount:
+ *           type: integer
+ *           example: 2
+ *         createdAt:
+ *           type: string
+ *           description: ISO 8601 date and time the booking was made
+ *           example: '2026-11-20T14:05:00.000Z'
+ */
+
+/**
+ * @openapi
+ * /api/users/me/bookings:
+ *   get:
+ *     summary: Get the signed-in user's bookings
+ *     description: >
+ *       Returns the bookings where one of the passengers has the same email address
+ *       as the signed-in user, newest first. Requires a signed-in session (cookie).
+ *       The email comes from the user's account, not from the request.
+ *     tags:
+ *       - Bookings
+ *     responses:
+ *       200:
+ *         description: A list of bookings (empty if the user has none)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/MyBooking'
+ *       401:
+ *         description: Not signed in, or the signed-in user no longer exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             example:
+ *               message: Authentication required
+ *       500:
+ *         description: Unexpected server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: Failed to fetch bookings
+ */
+apiRouter.get('/users/me/bookings', requireApiLogin, getMyBookings);
 
 export default apiRouter;

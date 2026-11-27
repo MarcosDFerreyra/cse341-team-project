@@ -1,0 +1,53 @@
+<%- include('./partials/header') %>
+<article class="dashboard-page">
+    <h1>Welcome, <%= user.display_name %></h1>
+
+    <section class="dashboard-bookings" aria-labelledby="bookings-heading">
+        <h2 id="bookings-heading">My Bookings</h2>
+        <p class="dashboard-note">These are the bookings where one of the passengers uses your email address.</p>
+
+        <div class="dashboard-state" id="bookings-loading">Loading your bookings...</div>
+        <div class="dashboard-state" id="bookings-empty" hidden>You don't have any bookings yet. <a href="/trips">Browse trips</a></div>
+        <div class="dashboard-state dashboard-error" id="bookings-error" hidden></div>
+
+        <div class="bookings-list" id="bookings-list" aria-live="polite"></div>
+
+        <template id="booking-card-template">
+            <div class="booking-card">
+                <div class="booking-card-header">
+                    <h3 data-field="trip-name"></h3>
+                    <span class="booking-reference">Reference: <span data-field="reference"></span></span>
+                </div>
+                <dl class="booking-details">
+                    <div>
+                        <dt>Travel day</dt>
+                        <dd class="capitalize" data-field="day"></dd>
+                    </div>
+                    <div>
+                        <dt>Ticket class</dt>
+                        <dd class="capitalize" data-field="ticket-class"></dd>
+                    </div>
+                    <div>
+                        <dt>Passengers</dt>
+                        <dd data-field="passengers"></dd>
+                    </div>
+                    <div>
+                        <dt>Booked on</dt>
+                        <dd data-field="booked-on"></dd>
+                    </div>
+                </dl>
+                <a href="#" data-field="confirmation-link">View confirmation</a>
+            </div>
+        </template>
+    </section>
+
+    <section class="dashboard-links" aria-labelledby="manage-heading">
+        <h2 id="manage-heading">Administration</h2>
+        <ul>
+            <li><a href="<%= bookingAdminPath %>">Booking admin</a></li>
+            <li><a href="<%= userAdminPath %>">User admin</a></li>
+        </ul>
+    </section>
+</article>
+<script src="/js/dashboard.js"></script>
+<%- include('./partials/footer') %>

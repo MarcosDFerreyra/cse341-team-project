@@ -26,4 +26,13 @@ const yenToUsd = (yen) => {
     return yen * exchangeRate;
 };
 
-export { generateConfirmationCode, kmToMiles, yenToUsd };
+export { generateConfirmationCode, kmToMiles, yenToUsd, getDashboardPath };
+
+/**
+ * Gets the path of the dashboard a signed-in user should use.
+ * @param {string} role - The user's role name, such as "customer" or "admin".
+ * @returns {string} "/admin" for admins and "/dashboard" for everyone else.
+ */
+const getDashboardPath = (role) => {
+    return role === 'admin' ? '/admin' : '/dashboard';
+};
