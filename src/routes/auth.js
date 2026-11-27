@@ -1,3 +1,4 @@
+
 import { Router } from 'express';
 import { register, login, logout } from '../controllers/users.js';
 import {
@@ -24,7 +25,15 @@ authRouter.post('/logout', logout);
 
 // admin routes
 authRouter.get("/admin", requirePageRole("admin"), (req, res) => {
-    res.render("admin", {title: "Admin Dashboard"})
-})
+    res.render("admin", { title: "Admin Dashboard" })
+});
+
+// Protected users page
+authRouter.get('/admin/users', requirePageLogin, (req, res) => {
+    res.render('users', {
+        title: 'User Management',
+        currentUserId: req.user.id
+    });
+});
 
 export default authRouter;

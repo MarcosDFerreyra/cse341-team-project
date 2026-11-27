@@ -1,7 +1,11 @@
 <%- include('./partials/header') %>
+
     <h1> Welcome to the Admin Dashboard</h1>
+
+    <a href="/admin/users">Manage Users</a>
+
     <form action="/logout" method="post">
         <button type="submit">Logout</button>
     </form>
 
-<%- include('./partials/footer') %>
+    <%- include('./partials/footer') %>

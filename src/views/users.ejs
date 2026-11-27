@@ -1,0 +1,46 @@
+<%- include('./partials/header') %>
+
+    <section class="content">
+        <h1>User Management</h1>
+
+        <p id="users-loading">Loading users...</p>
+        <p id="users-error" hidden></p>
+        <p id="users-empty" hidden>No users found.</p>
+
+    <div id="users-list" data-current-user-id="<%= currentUserId %>"></div>
+
+        <template id="user-card-template">
+            <article class="user-card">
+                <h2 data-field="display-name"></h2>
+
+                <p>Username: <span data-field="username"></span></p>
+                <p>Email: <span data-field="email"></span></p>
+                <p>Role: <span data-field="role"></span></p>
+
+                <button type="button" data-action="edit">Edit</button>
+                <button type="button" data-action="delete">Delete</button>
+
+                <form data-action="edit-form" hidden>
+                    <label>
+                        Display name:
+                        <input type="text" name="display_name" required>
+                    </label>
+
+                    <label>
+                        Username:
+                        <input type="text" name="username" required>
+                    </label>
+
+                    <label>
+                        Email:
+                        <input type="email" name="email" required>
+                    </label>
+
+                    <button type="submit">Save changes</button>
+                    <button type="button" data-action="cancel">Cancel</button>
+                </form>
+            </article>
+        </template>
+    </section>
+
+    <%- include('./partials/footer') %>

@@ -1,6 +1,13 @@
+
 import { Router } from 'express';
 import { getAllTripsApi, getTripByIdApi } from '../controllers/trips.js';
 import { getSchedulesForTrip, getSchedulesForTripAndMonth } from '../controllers/schedules.js';
+import {
+    getUsers,
+    updateUserAccount,
+    deleteUserAccount
+} from '../controllers/users.js';
+import { requireApiLogin } from '../middleware/auth.js';
 
 const apiRouter = Router();
 
@@ -269,5 +276,10 @@ const getTripSchedules = (req, res) => {
 };
 
 apiRouter.get('/trips/:id/schedules', getTripSchedules);
+
+// User management routes
+apiRouter.get('/users', requireApiLogin, getUsers);
+apiRouter.put('/users/:id', requireApiLogin, updateUserAccount);
+apiRouter.delete('/users/:id', requireApiLogin, deleteUserAccount);
 
 export default apiRouter;

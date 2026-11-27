@@ -1,3 +1,4 @@
+
 const hookTrainsCatalog = async () => {
     const listEl = document.getElementById('trains-list');
     const templateEl = document.getElementById('train-card-template');
@@ -259,9 +260,148 @@ const renderTrips = (trips) => {
     });
     return fragment;
 };
+const hookUsersPage = async () => {
+    const listEl = document.getElementById('users-list');
+    const templateEl = document.getElementById('user-card-template');
+    const loadingEl = document.getElementById('users-loading');
+    const errorEl = document.getElementById('users-error');
+    const emptyEl = document.getElementById('users-empty');
+
+    if (!listEl || !templateEl) {
+        return;
+    }
+
+    const currentUserId = listEl.dataset.currentUserId;
+
+    const showError = (message) => {
+        errorEl.hidden = false;
+        errorEl.textContent = message;
+    };
+
+    const loadUsers = async () => {
+        loadingEl.hidden = false;
+        errorEl.hidden = true;
+        emptyEl.hidden = true;
+        listEl.replaceChildren();
+
+        try {
+            const response = await fetch('/api/users');
+
+            if (!response.ok) {
+                throw new Error(`Failed to load users (${response.status})`);
+            }
+
+            const users = await response.json();
+
+            if (users.length === 0) {
+                emptyEl.hidden = false;
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            users.forEach((user) => {
+                const card = templateEl.content.cloneNode(true);
+
+                card.querySelector('[data-field="display-name"]').textContent = user.display_name;
+                card.querySelector('[data-field="username"]').textContent = user.username;
+                card.querySelector('[data-field="email"]').textContent = user.email;
+                card.querySelector('[data-field="role"]').textContent = user.role.name;
+
+                const editForm = card.querySelector('[data-action="edit-form"]');
+
+                editForm.elements.display_name.value = user.display_name;
+                editForm.elements.username.value = user.username;
+                editForm.elements.email.value = user.email;
+
+                card.querySelector('[data-action="edit"]').addEventListener('click', () => {
+                    editForm.hidden = !editForm.hidden;
+                });
+
+                card.querySelector('[data-action="delete"]').addEventListener('click', async () => {
+                    const confirmed = confirm(`Are you sure you want to delete ${user.display_name}?`);
+
+                    if (!confirmed) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/api/users/${user._id}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to delete user');
+                        }
+
+                        if (user._id === currentUserId) {
+                            window.location.href = '/login';
+                            return;
+                        }
+
+                        await loadUsers();
+
+                    } catch (error) {
+                        showError('Unable to delete user. Please try again.');
+                    }
+                });
+
+                card.querySelector('[data-action="cancel"]').addEventListener('click', () => {
+                    editForm.hidden = true;
+
+                    editForm.elements.display_name.value = user.display_name;
+                    editForm.elements.username.value = user.username;
+                    editForm.elements.email.value = user.email;
+                });
+
+                editForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    const updates = {
+                        display_name: editForm.elements.display_name.value,
+                        username: editForm.elements.username.value,
+                        email: editForm.elements.email.value
+                    };
+
+                    try {
+                        const response = await fetch(`/api/users/${user._id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(updates)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to update user');
+                        }
+
+                        await loadUsers();
+
+                    } catch (error) {
+                        showError('Unable to update user. Please try again.');
+                    }
+                });
+
+                fragment.appendChild(card);
+            });
+
+            listEl.replaceChildren(fragment);
+
+        } catch (error) {
+            showError('Unable to load users. Please try again.');
+        } finally {
+            loadingEl.hidden = true;
+        }
+    };
+
+    await loadUsers();
+};
+
 
 document.addEventListener('DOMContentLoaded', () => {
     hookTrainsCatalog();
     hookTripSchedules();
     hookTripGrid();
+    hookUsersPage();
 });
